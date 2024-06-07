@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EstebanChat</title>
+    <script type="module" >
+        import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
+        const socket = io({
+            auth:{
+                serverOffset: 0
+            }
+        });
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        })
+        socket.on('chat message', (msg, serverOffset) => {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            item.style.border = '1px solid #ccc'; // Borde de la tarjeta
+            item.style.padding = '10px'; // Espaciado interno de la tarjeta
+            item.style.marginBottom = '10px'; // Espacio debajo de la tarjeta
+            item.style.borderRadius = '5px'; // Bordes redondeados de la tarjeta
+            messages.appendChild(item);
+            socket.auth.serverOffset = serverOffset;
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    </script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            margin: 0;
+            padding: 36px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: grid;
+            place-content: center;
+            height: 100vh;
+            grid-template-rows: 1fr;
+        }
+
+        #chat {
+            display: grid;
+            grid-template-rows: 1fr auto;
+            width: 350px;
+            max-width: 400px;
+            height: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #form {
+            bottom: 0;
+            display: flex;
+            height: 48px;
+            position: absolute;
+            right: 0;
+            left: 0;            
+            padding: 4px;
+
+        }
+
+        #input {
+            
+            border: 1px solid #eee;
+            border-radius: 999px;
+            flex: 1;
+            margin: 4px;
+            padding:0 8px;
+            
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 8px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="chat">
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" type="text" name="message" id="message" placeholder="Escribe un mensaje...">
+            <button type="submit">Enviar</button>
+        </form>
+    </section>
+</body>
+
+</html>
